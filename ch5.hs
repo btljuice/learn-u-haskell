@@ -98,7 +98,7 @@ collatz n
       | odd n  = n : collatz (3*n + 1)
 
 collatzAnswer = length [1 | i <- [1..100], length (collatz i) > 15]
-collatzAnswer' = length (filter (> 15) (map (length . collatz) [1..100]))
+collatzAnswer' = length $ filter (> 15) $ map (length . collatz) [1..100]
 
 -- Mapping functions w/ multiple parameterj
 -- map (*) [0..1] will return a list of Int -> Int, waiting to be evaluated
@@ -151,3 +151,64 @@ last' = foldl1 (\_ x -> x)
 and' :: [Bool] -> Bool
 and' = foldr1 (&&) -- === (a0 && (a1 && (a2 && ...)))
 -- and' ((replicate 100 True) ++ (repeat False)) -- This returns False
+
+-- scanl: like foldl but keeps the intermediate results
+--    scanl (+) 0 [3, 5, 2, 1] === [0, 3, 8, 10, 11]
+--                                 ---------------->
+-- scanr: like foldr but keeps the intermediate results
+--    scanr (+) 0 [3, 5, 2, 1] === [11, 8, 3, 1, 0]
+--                                 <---------------
+-- Take note here of the order of all the results are given
+-- DEBUG: Scan can be used to monitor the progress of a fold execution
+
+-- Q: How many elements are in 1^2 + 2^2 + ...n^2 > 1000
+sumsSqr = takeWhile (<= 1000) (scanl1 (+) [sqrt i | i <- [1..]])
+
+-- Function application $
+-- ($) :: (a -> b) -> a -> b
+-- `$` has the lowest precedence. Because of that it is used to make function call
+-- right associative. It is used to reduce the number of ()
+-- By default:
+--   f a b c = (((f a) b) c)
+-- - By analogy the dollar sign is like a right -> left pipe.
+-- - You can imagine $ as almost being the equivalent of writing an opening
+--   parenthesis and then writing a closing parenthesis on the far right side of the expression.
+woDollarSignExample = sum (filter (> 10) (map (*2) [2..10]))
+dollarSignExample = sum $ filter (> 10) $ map (*2) [2..10]
+
+-- Apply a value over functions
+applyExample = map ($ 3) [(4+), (10*), (^2), sqrt]
+
+
+-- Function composition: Use '.' symbol
+-- '.' is right-associative so:
+-- (f . g . h) == (f . (g . h))
+
+-- For function composition w/ multiple parameters, we have to apply all but one parameter
+-- to make it work:
+-- sum (replicate 5 (max 6.7 8.9))
+-- To remove parentheses:
+-- 1. Write inner most expression
+-- 2. Prefix a $
+-- 3. Then connect the rest w/ . composition
+-- Example:
+repComp = replicate 2 (product (map (*3) (zipWith max [1, 2] [4, 5])))
+-- 1. + 2. === $ zipWith max [1, 2] [4, 5]
+repComp' = replicate 2 . product . map (*3) $ zipWith max [1, 2] [4, 5]
+
+
+-- Point-Free Style
+-- Instead of writing
+--     sum xs = foldl (+) 0 xs
+-- We write
+--     sum = foldl (+) 0
+-- Omitting the last parameter when it's at the end of both the rhs and lhs expression
+-- This would apply to more than one parameter as well.
+fn :: Int -> Int
+fn x = ceiling (negate (tan (cos (max 50 x))))
+fn' :: Int -> Int
+fn' = ceiling . negate . tan . cos . max 50
+-- Point free style advantage
+-- 1. More consise
+-- 2. Makes you think in terms of function instead of data
+
