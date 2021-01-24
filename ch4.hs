@@ -9,7 +9,7 @@ myMax :: (Ord a) => [a] -> a
 myMax [] = error "Max needs at least one argument"
 myMax [i] = i
 myMax [i,j] = if i > j then i else j
-myMax (i:j:s) = myMax ((myMax [i,j]):s)
+myMax (i:j:s) = myMax (myMax [i,j] : s)
 
 myReplicate :: Int -> a -> [a]
 myReplicate 0 _ = []
