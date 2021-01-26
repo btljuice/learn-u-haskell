@@ -6,6 +6,7 @@ import qualified Data.List as L
 import qualified Data.Char as C
 import Data.Maybe
 import qualified Data.Map as Map
+import qualified Geometry.Cube as Cube
 
 -- nub: Remove duplicates
 numUniques :: (Eq a) => [a] -> Int
@@ -95,3 +96,6 @@ phoneBookDigitsMap = Map.map toDigits phoneBookMap
 phoneBookDupMap = Map.fromListWith (++) $ map (\(k, v) -> (k, [v])) phoneBook
 -- Keep in mind that the concatenation function can do anything to merge the values
 -- ex. max, sum, count, etc.
+
+
+cubeArea = Cube.area 3.0
