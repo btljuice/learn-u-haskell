@@ -1,3 +1,9 @@
+-- Neat REPL commands:
+-- :h help
+-- :t <expression> <= type
+-- :doc <expression>
+-- :info <expression>
+-- :k <expression< <= kinds
 doubleMe x = x + x
 doubleUs x y = doubleMe x + doubleMe y
 doubleSmallNum x = if x > 100 then x else 2*x
