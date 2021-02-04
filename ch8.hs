@@ -5,7 +5,9 @@
 -- * You cannot bind on the last statement however.
 -- * You can use a let with a do block to bind pure values
 
+import Control.Monad
 import Data.Char
+
 main' = do
   putStrLn "Hello, what's your first name?"
   fn <- getLine
@@ -52,3 +54,40 @@ main3 = do
 -- * It must be the last statement executed from the I/O Block, otherwise it is ignored
 -- * return "haha", would return the string
 -- * return (), would return nothing since it's the unit value
+-- Some I/O print functions
+-- putStr, putChar, print === putStrLn . show
+
+-- when
+main4 = do
+  input <- getLine
+  when (input == "SWORDFISH") $ do
+    putStrLn input
+-- when <p> do <block> === if <b> then do <block> else return ()
+
+
+-- sequence
+-- w/ sequence you can batch a bunch of IO and concatenate their result.
+main5 = do
+  rs <- sequence [getLine, getLine, getLine] -- [ IO String ] -> IO [ String ]
+  print rs
+  
+
+
+-- function mapM and mapM_
+-- mapM print [1, 2, 3] === sequence $ map print [1, 2, 3]
+ 
+-- forever loops infinitely
+main6 = forever $ do
+  putStr "Give me some input: "
+  l <- getLine
+  putStrLn $ map toUpper l
+
+-- forM (like mapM but w/ parameters inverted
+main7 = do
+  colors <- forM [1,2,3,4] (\a -> do
+          putStrLn $ "Which color do you associate with the number "
+                     ++ show a ++ "?"
+          color <- getLine
+          return color)
+  putStrLn "The colors that you associate with 1, 2, 3 and 4 are: "
+  mapM putStrLn colors
