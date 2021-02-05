@@ -1,16 +1,32 @@
+import Control.Exception
+import Data.List
+import System.IO
 import System.Environment
+import System.Directory
+
 addTodo :: String -> String -> IO()
 addTodo fn todo = do
-  putStrLn $ "addTodo " ++ fn ++ " " ++ todo
+  appendFile fn (todo ++ "\n")
 
 viewTodo :: String -> IO()
-viewTodo fn =
-  putStrLn $ "viewTodo " ++ fn
+viewTodo fn = do
+  contents <- readFile fn
+  putStr contents
 
 removeTodo :: String -> Int -> IO()
 removeTodo fn num = do
-  putStrLn $ "removeTodo " ++ fn ++ " " ++ show num
-
+  contents <- readFile fn
+  let todoTasks = lines contents
+      newTodoItems = unlines $ delete (todoTasks !! num) todoTasks
+  bracketOnError (openTempFile "." "temp")
+    (\(tempName, tempHandle) -> do
+        hClose tempHandle
+        removeFile tempName)
+    (\(tempName, tempHandle) -> do
+        hPutStr tempHandle newTodoItems
+        hClose tempHandle
+        removeFile fn
+        renameFile tempName fn)
 
 main = do
   args <- getArgs
