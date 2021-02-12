@@ -4,6 +4,7 @@ import Data.List
 import System.IO
 import System.Directory
 import System.Environment
+import System.Random
 
 -- getContents returns the whole stdin pipe
 -- Once compiled, you can invoke this program the following way at the shell
@@ -94,3 +95,35 @@ main5 = do
   mapM_ putStrLn args
   putStrLn "The program name is: "
   putStrLn progName
+
+
+-- Randomness
+-- System.random works like in scala functional programming book:
+-- Each call is stateless, and returns both the new value and the new state as a tuple
+someRandomNum :: (Int, StdGen)
+someRandomNum = random (mkStdGen 100)
+
+-- randoms is like an infinite random stream, you take as much as you need.
+-- The drawback is that it does not provide the seed as a return value. The goal is probably
+-- to initiate the stream and just pull from it whenever a random value is needed
+threeCoins' :: [Bool]
+threeCoins' = take 3 $ randoms (mkStdGen 1)
+
+-- Here's our custom finiteRandom, that pick n random value, and returns the RandomGen value
+finiteRandom :: (RandomGen g, Random a, Num n, Eq n, Ord n) => n -> g -> ([a], g)
+finiteRandom n g
+  | n == 0 = ([], g)
+  | n < 0 = error "n must be >= 0"
+  | otherwise = (h:t, gn)
+  where (h, g1) = random g
+        (t, gn) = finiteRandom (n-1) g1
+
+threeCoins :: [Bool]
+threeCoins = fst $ finiteRandom 3 (mkStdGen 1)
+
+-- For a random value within a range, you can:
+dieRoll :: (Int, StdGen)
+dieRoll = randomR (1, 6) (mkStdGen 1)
+
+-- Finally randomRs for a random stream of a certain range
+randString = take 10 $ randomRs ('a', 'z') (mkStdGen 3)
