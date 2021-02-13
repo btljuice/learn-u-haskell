@@ -5,6 +5,8 @@ import System.IO
 import System.Directory
 import System.Environment
 import System.Random
+import qualified Data.ByteString.Lazy as LBS
+import qualified Data.ByteString as SBS
 
 -- getContents returns the whole stdin pipe
 -- Once compiled, you can invoke this program the following way at the shell
@@ -127,3 +129,38 @@ dieRoll = randomR (1, 6) (mkStdGen 1)
 
 -- Finally randomRs for a random stream of a certain range
 randString = take 10 $ randomRs ('a', 'z') (mkStdGen 3)
+
+
+-- getStdGen will return the same gen while newStdGen will return a new generator
+main6 = do
+  gen <- getStdGen -- Use for the global generator
+  putStrLn $ take 20 (randomRs ('a', 'z') gen)
+
+
+-- Converts lazy list to semi-lazy byte string
+lazyPacking = LBS.pack [98..120]
+lazyUnpacking = LBS.unpack lazyPacking
+strictPacking = SBS.pack [98..108]
+fromStrictToLazy = LBS.cons 85 $ LBS.fromChunks [strictPacking, strictPacking, strictPacking ]
+
+
+-- Copy program w/ lazy operations
+-- Only 2 differences is in the Stream operations
+mainCopy = do
+  (fileName1:fileName2:_) <- getArgs
+  copy fileName1 fileName2
+
+copy source dest = do
+  contents <- LBS.readFile source -- 1st lazy operator
+  bracketOnError
+    (openTempFile "." "temp")
+    (\(tempName, tempHandle) -> do
+      hClose tempHandle
+      removeFile tempName)
+    (\(tempName, tempHandle) -> do
+      LBS.hPutStr tempHandle contents -- 2nd lazy operator
+      hClose tempHandle
+      renameFile tempName dest)
+
+-- Key take here is that in most circumstances you can use strict VS lazy streams interchangeably
+-- depending of your needs
