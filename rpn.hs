@@ -1,16 +1,10 @@
-import Data.List.Split
+solveRPN :: String -> Double
+solveRPN expression = head $ foldl calc [] (words expression)
+  where calc :: [Double] -> String -> [Double]
+        calc (a:b:t) "+" = (b+a):t
+        calc (a:b:t) "-" = (b-a):t
+        calc (a:b:t) "*" = (b*a):t
+        calc (a:b:t) "/" = (b/a):t
+        calc t n = (read n):t
 
-calc :: [Double] -> String -> [Double]
-calc (a:b:t) "+" = (b+a):t
-calc (a:b:t) "-" = (b-a):t
-calc (a:b:t) "*" = (b*a):t
-calc (a:b:t) "/" = (b/a):t
-calc t n = (read n):t
-
-solveRPN :: [String] -> Double
-solveRPN ss = impl [] ss
-  where impl acc [] = head acc
-        impl acc (s:t) = impl (calc acc s) t
-
-
-test1 = solveRPN [ "10", "4", "3", "+", "2", "*", "-"]
+test1 = solveRPN "10 4 3 + 2 * -"
