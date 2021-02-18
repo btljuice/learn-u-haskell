@@ -23,13 +23,17 @@ heathrowToLondon = [ Section 50 10 30
                    , Section 10  8  0
                    ]
 
-shortest :: RoadSystem -> ((Path, Int), (Path, Int))
-shortest = foldl calc (([], 0), ([], 0))
-  where calc ((pa, la), (pb, lb)) (Section a b c) =
-          let new_pa1 = la + a
-              new_pa2 = lb + b + c
-              new_pb1 = lb + b
-              new_pb2 = la + a + c
-              sol_a = if new_pa1 < new_pa2 then ((A, a):pa, new_pa1) else ((C, c):(B, b):pb, new_pa2)
-              sol_b = if new_pb1 < new_pb2 then ((B, b):pb, new_pb1) else ((C, c):(A, a):pa, new_pb2)
-          in (sol_a, sol_b)
+roadStep :: ((Path, Int), (Path, Int)) -> Section -> ((Path, Int), (Path, Int))
+roadStep ((pa, la), (pb, lb)) (Section a b c) =
+  let new_pa1 = la + a
+      new_pa2 = lb + b + c
+      new_pb1 = lb + b
+      new_pb2 = la + a + c
+      sol_a = if new_pa1 <= new_pa2 then ((A, a):pa, new_pa1) else ((C, c):(B, b):pb, new_pa2)
+      sol_b = if new_pb1 <= new_pb2 then ((B, b):pb, new_pb1) else ((C, c):(A, a):pa, new_pb2)
+  in (sol_a, sol_b)
+
+optimalPath :: RoadSystem -> (Path, Int)
+optimalPath rs =
+  let ((pa, la), (pb, lb)) = foldl roadStep (([], 0), ([], 0)) rs
+  in if la <= lb then (reverse pa, la) else (reverse pb, lb)
