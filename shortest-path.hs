@@ -10,6 +10,26 @@
 --    path_a = min( path_a + a(i) , path_b + b(i) + c(i) )
 --    path_b = min( path_b + b(i) , path_a + a(i) + c(i) )
 
-shortest :: [(Int, Int, Int)] -> (Int, Int)
-shortest = foldl calc (0, 0)
-  where calc (pa, pb) (a, b, c) = (min (pa + a) (pb + b + c), min (pb + b) (pa + a + c))
+data Section = Section { getA :: Int, getB :: Int, getC :: Int } deriving (Show)
+type RoadSystem = [Section]
+
+data Label = A | B | C deriving (Show)
+type Path = [(Label, Int)]
+
+heathrowToLondon :: RoadSystem
+heathrowToLondon = [ Section 50 10 30
+                   , Section  5 90 20
+                   , Section 40  2 25
+                   , Section 10  8  0
+                   ]
+
+shortest :: RoadSystem -> ((Path, Int), (Path, Int))
+shortest = foldl calc (([], 0), ([], 0))
+  where calc ((pa, la), (pb, lb)) (Section a b c) =
+          let new_pa1 = la + a
+              new_pa2 = lb + b + c
+              new_pb1 = lb + b
+              new_pb2 = la + a + c
+              sol_a = if new_pa1 < new_pa2 then ((A, a):pa, new_pa1) else ((C, c):(B, b):pb, new_pa2)
+              sol_b = if new_pb1 < new_pb2 then ((B, b):pb, new_pb1) else ((C, c):(A, a):pa, new_pb2)
+          in (sol_a, sol_b)
