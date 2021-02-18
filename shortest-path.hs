@@ -10,6 +10,8 @@
 --    path_a = min( path_a + a(i) , path_b + b(i) + c(i) )
 --    path_b = min( path_b + b(i) , path_a + a(i) + c(i) )
 
+import Data.List
+
 data Section = Section { getA :: Int, getB :: Int, getC :: Int } deriving (Show)
 type RoadSystem = [Section]
 
@@ -37,3 +39,17 @@ optimalPath :: RoadSystem -> (Path, Int)
 optimalPath rs =
   let ((pa, la), (pb, lb)) = foldl roadStep (([], 0), ([], 0)) rs
   in if la <= lb then (reverse pa, la) else (reverse pb, lb)
+
+groupsOf :: Int -> [a] -> [[a]]
+groupsOf 0 _ = undefined
+groupsOf _ [] = []
+groupsOf n xs = take n xs : groupsOf n (drop n xs)
+
+main = do
+  contents <- getContents
+  let threes = groupsOf 3 (map read $ lines contents)
+      roadSystem = map (\[a, b, c] -> Section a b c) threes
+      (path, pathTime) = optimalPath roadSystem
+      pathString = concat $ map (show . fst) path
+  putStrLn $ "The best path to take is: " ++ pathString
+  putStrLn $ "Time taken: " ++ show pathTime
