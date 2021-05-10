@@ -11,6 +11,12 @@ myMax [i] = i
 myMax [i,j] = if i > j then i else j
 myMax (i:j:s) = myMax (myMax [i,j] : s)
 
+myMax2 :: (Ord a) => [a] -> a
+myMax2 [] = error "Max needs a least one argument"
+myMax2 [i] = i
+myMax2 [i, j] = if i > j then i else j
+myMax2 (x:xs) = myMax2 [x, myMax xs]
+
 myReplicate :: Int -> a -> [a]
 myReplicate 0 _ = []
 myReplicate n a = a : myReplicate (n-1) a

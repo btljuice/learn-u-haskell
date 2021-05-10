@@ -1,7 +1,7 @@
 -- Pattern matching
 draw2Dice :: Int -> String
 draw2Dice 7 = "Win"
-draw2Dice n = "Lose" -- variables that start w/ a lower case act as a "catchall"
+draw2Dice _ = "Lose" -- variables that start w/ a lower case act as a "catchall"
 
 -- If you don't have a catchall, non-exhaustive pattern match will throw an exception
 diceNumber :: Int -> String
@@ -18,7 +18,7 @@ factorial 0 = 1
 factorial n = n * factorial(n - 1)
 
 -- Tuple pattern match
-addVectors:: (Int, Int) -> (Int, Int) -> (Int, Int)
+addVectors :: (Int, Int) -> (Int, Int) -> (Int, Int)
 -- addVectors a b = (fst a + fst b, snd a + snd b)
 addVectors (i0, j0) (i1, j1) = (i0 + i1, j0 + j1)
 
@@ -27,14 +27,8 @@ third :: (a, b, c) -> c
 third (_, _, c) = c
 
 -- Pattern match in list comprehension
-umbrellaLabels = [ "Number " ++ show n | n <- [1..7]]
-umbrellaNames = ["Luther", "Diego", "Allison", "Klaus", "The Boy", "Ben", "Vanya"]
-umbrellaTeam = zip3 [1..7] umbrellaLabels umbrellaNames
-
--- Pattern match tuple here
-sumNumbers = sum [ n | (n, _, _) <- umbrellaTeam ]
--- If Pattern match fails, it will skip the element
-sumOneNumbers = sum [ n | (n, _, "Luther") <- umbrellaTeam ]
+xs = [(1,3), (4, 3), (2,4), (5,3), (5,6), (3,1)]
+sumXs = [a+b | (a,b) <- xs]
 
 -- Pattern match on list
 myHead :: [a] -> a
@@ -62,7 +56,7 @@ bmiTell w h
   | bmi <= overweight = "Overweight"
   | otherwise = "Obese"
   where bmi = w/h^2
-        [skinny, normal, overweight] = [18.5, 25.0, 30.0]
+        [skinny, normal, overweight] = [18.5, 25.0, 30.0] -- Pattern matching here as well
 
 -- Pattern match in where clause; where clause is in the function scope
 initials :: String -> String -> [Char]
@@ -78,7 +72,9 @@ calcBmis hws = [bmi w h | (w, h) <- hws]
 
 -- Let vs Where: There almost the same, but differ in style
 -- Let => Expression
+--   As it is an expression, it can be inserted locally pretty much everywhere
 -- Where => Declaration
+--   It's usually at the function level, as shown in the examples above
 -- See https://wiki.haskell.org/Let_vs._Where for more differences
 initialsLet :: String -> String -> String
 initialsLet firstName lastName =
@@ -96,10 +92,12 @@ letComputation = 4 * (let a = 9 in a/(a+1)) + 2
 -- Let can use the pattern matching
 letList = [let (a, b, c) = (1, 2, 3) in a+b+c]
 -- Let in list comprehension
+---  Take note that the `in` keyword is not used here
 letListComprehension = [bmi | (w, h) <- [(85, 1.9), (100,1.65)], let bmi = w/h^2, bmi > 1]
 
 
--- case expressions
+-- case expressions.
+-- Akin to the pattern matching done at the function signature level, but can be used like an expression
 describeList :: [a] -> String
 describeList l = "The list is " ++ case l of [] -> "empty."
                                              [_] -> "a singleton list."

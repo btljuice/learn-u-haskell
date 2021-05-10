@@ -1,6 +1,7 @@
 -- Higher order function
 -- All Haskell function are curried by default
 
+-- Equivalent to mult3 :: (Num a) => a -> (a -> (a -> a))
 mult3 :: (Num a) => a -> a -> a -> a
 mult3 x y z = x*y*z
 
@@ -12,8 +13,8 @@ compareTo10 = compare 10
 -- By putting a symbol function in parenthesis, you get the curried function
 -- Exception to this rule is the unary operation - (ex. -4).
 -- Use the substract function instead
-divideBy10 = (/10)
-hundredDividedBy = (100/)
+divideBy10 = (/ 10)
+hundredDividedBy = (100 /)
 
 -- section works  for infix notation also
 isAlphaChar :: Char -> Bool
@@ -115,12 +116,17 @@ collatzAnswer'' = length (filter (\ xs -> length xs > 15) (map collatz [1..100])
 gimmickyAdd3 :: Int -> Int -> Int -> Int
 gimmickyAdd3 = \x -> \y -> \z -> x + y + z
 
+-- Here, the user of lambda helps make it more explicit that the common usecase of flip is
+-- to have a function as primary input
 flip' :: (a -> b -> c) -> b -> a -> c
 flip' f = \x y -> f y x
 
 -- Foldleft
 sum' :: (Num a) => [a] -> a
 sum' = foldl (+) 0
+
+elem' :: (Eq a) => a -> [a] -> Bool
+elem' x = foldl (\acc y -> acc || x == y) False
 
 reverse' :: [a] -> [a]
 reverse' = foldl (flip' (:)) []
@@ -130,6 +136,11 @@ product' = foldl (*) 1
 
 filter'' :: (a -> Bool) -> [a] -> [a]
 filter'' f = foldr (\ x acc -> if f x then x:acc else acc) []
+
+map'' :: (a -> b) -> [a] -> [b]
+map'' f = foldr (\x acc -> (f x) : acc) []
+
+-- foldl1 and foldr1 are the equivalent of scala List.reduce
 
 last' :: [a] -> a
 last' = foldl1 (\_ x -> x)
@@ -166,6 +177,7 @@ sumsSqr = takeWhile (<= 1000) (scanl1 (+) [sqrt i | i <- [1..]])
 
 -- Function application $
 -- ($) :: (a -> b) -> a -> b
+-- f $ x = f x
 -- `$` has the lowest precedence. Because of that it is used to make function call
 -- right associative. It is used to reduce the number of ()
 -- By default:
@@ -173,10 +185,13 @@ sumsSqr = takeWhile (<= 1000) (scanl1 (+) [sqrt i | i <- [1..]])
 -- - By analogy the dollar sign is like a right -> left pipe.
 -- - You can imagine $ as almost being the equivalent of writing an opening
 --   parenthesis and then writing a closing parenthesis on the far right side of the expression.
+
+-- Function application $ 1: Remove parentheses
 woDollarSignExample = sum (filter (> 10) (map (*2) [2..10]))
 dollarSignExample = sum $ filter (> 10) $ map (*2) [2..10]
 
--- Apply a value over functions
+-- Function application $ 2: Use map over functions instead of data.
+-- map <data> [functions]
 applyExample = map ($ 3) [(4+), (10*), (^2), sqrt]
 
 

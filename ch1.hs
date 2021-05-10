@@ -62,4 +62,4 @@ aTuple = (1, "Number One", "Luther", 3.5)
 -- Side are integer within 1..10
 -- Perimeter == 24
 -- Right angle triangle
-rightTriangle = [(x, y, z) | x <- [1..10], y <- [x..10], z <- [y..10], i + y + z == 24, x^2 + y^2 == z^2 ]
+rightTriangle = [(x, y, z) | x <- [1..10], y <- [x..10], z <- [y..10], x + y + z == 24, x^2 + y^2 == z^2 ]
